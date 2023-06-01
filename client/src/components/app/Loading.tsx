@@ -1,13 +1,15 @@
 import { Spinner, Text } from '@chakra-ui/react';
 import { ReactElement } from 'react';
+import { useIsFetching } from 'react-query';
 
 export function Loading(): ReactElement {
-  // will use React Query `useIsFetching` to determine whether or not to display
-  const isFetching = false; // for now, just don't display
+  // returns number of queries that are currently fetching
+  const isFetching = useIsFetching();
 
   const display = isFetching ? 'inherit' : 'none';
 
   return (
+    // @ts-ignore
     <Spinner
       thickness="4px"
       speed="0.65s"
@@ -21,6 +23,7 @@ export function Loading(): ReactElement {
       transform="translate(-50%, -50%)"
       display={display}
     >
+      {/* @ts-ignore */}
       <Text display="none">Loading...</Text>
     </Spinner>
   );
