@@ -20,6 +20,13 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       onError: queryErrorHandler,
+      staleTime: 60 * 1000 * 10, // 10 minute
+      cacheTime: 60 * 1000 * 15, // 15 minute
+      // disable refetching on mount, window focus, and reconnect
+      // globally for all queries
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     },
   },
 });
