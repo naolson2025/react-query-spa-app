@@ -24,7 +24,10 @@
     "isolatedModules": true,
     "noEmit": true,
     "downlevelIteration": true,
-    "strict": true
+    "strict": true,
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "node_modules/@types"]
 }
