@@ -3,9 +3,9 @@ import { UseMutateFunction, useMutation, useQueryClient } from 'react-query';
 
 import type { User } from '../../../../../shared/types';
 import { axiosInstance, getJWTHeader } from '../../../axiosInstance';
+import { queryKeys } from '../../../react-query/constants';
 import { useCustomToast } from '../../app/hooks/useCustomToast';
 import { useUser } from './useUser';
-import { queryKeys } from 'react-query/constants';
 
 // for when we need a server function
 async function patchUserOnServer(
@@ -46,7 +46,7 @@ export function usePatchUser(): UseMutateFunction<
         // doesn't overwrite new data
         queryClient.cancelQueries(queryKeys.user);
         // snapshot of previous value
-        const previousUserDataContext = queryClient.getQueryData(
+        const previousUserDataContext: User = queryClient.getQueryData(
           queryKeys.user,
         );
         // optimistically update the cache with the new value
@@ -54,15 +54,29 @@ export function usePatchUser(): UseMutateFunction<
         // return context object with snapshot of previous value
         return { previousUserDataContext };
       },
-      onError: (previousUserDataContext) => {
+      onError: (error, newData, context) => {
         // roll back cache to previous value
+        // if we have a previous value
+        if (context.previousUserDataContext) {
+          updateUser(context.previousUserDataContext);
+          toast({
+            title: 'User updated failed, restoring previous data',
+            status: 'error',
+          });
+        }
       },
       onSuccess: (userData: User | null) => {
-        updateUser(userData);
-        toast({
-          title: 'User updated',
-          status: 'success',
-        });
+        if (user) {
+          toast({
+            title: 'User updated',
+            status: 'success',
+          });
+        }
+      },
+      onSettled: () => {
+        // invalidate cache, in order to trigger a re-fetch
+        // to make sure our data is up-to-date
+        queryClient.invalidateQueries(queryKeys.user);
       },
     },
   );
